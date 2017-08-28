@@ -1,0 +1,301 @@
+\RequirePackage[l2tabu, orthodox]{nag}
+\RequirePackage{silence}
+\documentclass[french,english]{beamer}
+\input{preamble/packages}
+\input{preamble/math_basics}
+\input{preamble/math_mine}
+\input{preamble/redac}
+%\input{preamble/draw}
+\input{preamble/acronyms}
+
+\setbeamertemplate{headline}[singleline]
+%\setbeamertemplate{footline}[authortitle]
+
+\title[Modular XMCDA]{A proposal for modular XMCDA}
+\subject{XMCDA}
+\keywords{key, koy}
+\author{Olivier Cailloux}
+\institute[LAMSADE]{LAMSADE, Université Paris-Dauphine}
+\date{\formatdate{20}{9}{2017}}
+
+\begin{document}
+\begin{frame}[plain]
+	\tikz[remember picture,overlay]{
+		\path (current page.south west) node[anchor=south west, inner sep=0] {
+			\includegraphics[height=1cm]{LAMSADE95.jpg}
+		};
+		\path (current page.south) ++ (0, 1mm) node[anchor=south, inner sep=0] {
+			\includegraphics[height=9mm]{Dauphine.jpg}
+		};
+		\path (current page.south east) node[anchor=south east, inner sep=0] {
+			\includegraphics[height=1cm]{PSL.png}
+		};
+	}
+	\titlepage
+\end{frame}
+\addtocounter{framenumber}{-1}
+
+\section{My goal}
+\subsection{Focus}
+\begin{frame}
+	\frametitle{My goal (broadly)}
+	\begin{itemize}
+		\item Improve XMCDA
+		\item Long term goal!
+		\item Compatible with evolutions to come (XMCDA v3)
+		\item This is not a criticism of existing work
+		\item \emph{I}’ll (try to) take care of it
+		\item Comments / Help welcome
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Outline}
+	\tableofcontents[hideallsubsections, sectionstyle=shaded/show]
+\end{frame}
+
+\AtBeginSection{
+	\begin{frame}
+		\frametitle{Outline}
+		\tableofcontents[currentsection, hideallsubsections]
+	\end{frame}
+}
+
+\section{Overview}
+\begin{frame}
+	\frametitle{My goal (more specifically)}
+	\begin{itemize}
+		\item We want to let \acp{WS} communicate
+		\item Communication requires standard language
+		\item Common language ≠ constraints specific to WS
+		\item Currently: non standard encoding of specific constraints (diviz-like)
+		\item Not taken into account in your programming language
+		\item SOAP calls allowed, but does not embrace standards
+		\item My goal 1: improve compatibility with standards
+		\item My goal 2: ease development
+		\item My constraint: compatibility with XMCDA
+	\end{itemize}
+\end{frame}
+
+\section{Current state}
+\begin{frame}
+	\frametitle{Example of \acp{WS}}
+	\ac{WS} 1
+	\begin{itemize}
+		\item I want a non-empty list of alternatives each having a name and a value
+		\item Example input (conceptually) : $\set{("a1", 3), ("a2", 10), ("blah", 4)}$
+		\item I provide as an output an ordered list of alternatives
+		\item Example output: $("a2", "blah", "a1")$
+	\end{itemize}
+	\ac{WS} 2
+	\begin{itemize}
+		\item Input: an ordered list of alternatives; evaluations for each of these alternatives; a value function
+		\item Output: binary (is the list ranked according to the value function?)
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Desired}
+	\begin{itemize}
+		\item In example: Common encoding of “ordered list of alternatives”
+		\item In general: Common encoding of other inputs and outputs: “list of alternatives each having a name and a value”, …
+		\item With low redundancy: only one way of specifying each possible input type
+		\item Common language, but each WS have specific inputs and outputs
+	\end{itemize}
+%		\item Developer is helped with automatic check of type constraints satisfaction
+%		\item Declaration of constraints in a standard language: 
+\end{frame}
+
+\begin{frame}
+	\frametitle{Current approach}
+	Common language
+	\begin{itemize}
+		\item Each \ac{WS} must accept and produce XMCDA
+		\item Specified with a schema
+		\item Version 3 in preparation
+		\item Improvements done about “low redundancy”
+	\end{itemize}
+	Specificities of \acp{WS}
+	\begin{itemize}
+		\item Not every \ac{WS} accepts every XMCDA valid input
+		\item Each \ac{WS} specifies its supplementary constraints in a diviz web descriptor
+		\item Diviz uses this for its user interface
+		\item Developers manually check their input
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Some details}
+	Common language
+	\begin{itemize}
+		\item XMCDA schema specifies the grammar of valid XMCDA encoding
+		\item Very permissive (out of necessity): has to accept inputs and outputs that are valid for at least one \ac{WS}
+		\item Valid iff contains alternatives OR criteria OR value functions OR …
+	\end{itemize}
+	\newlength{\XMSchLeft}
+	\setlength{\XMSchLeft}{6cm}
+	\begin{minipage}[c]{\XMSchLeft}
+		Specific constraints
+		\begin{itemize}
+			\item Developer specifies input type
+			\item Through Diviz descriptor (\href{http://www.decision-deck.org/ws/_downloads/description-wsDD22.xml}{example})
+		\end{itemize}
+	\end{minipage}%
+	\begin{minipage}[c]{\the\columnwidth - \XMSchLeft}
+		\includegraphics[width=\columnwidth]{diviz-J-MCDA-components.png}
+	\end{minipage}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Some details: simplify developers work}
+	Also: simplify developers work
+	\begin{itemize}
+		\item Diviz framework cuts this input into pieces: alternatives; value functions; …
+		\item Developer programs a \ac{WS} by simply reading from different inputs (one input per type)
+	\end{itemize}
+	But…
+	\begin{itemize}
+		\item Tendency to mandate use of library to guarantee constraints satisfaction beyond schema valid files
+	\end{itemize}
+\end{frame}
+
+\section{Modular XMCDA}
+\begin{frame}
+	\frametitle{Goals: More standard conforming}
+	\begin{itemize}
+		\item Use XML schemas to constrain every \acp{WS}
+		\item SOAP calls with schema constrained input
+		\item Automatic discovery of compatible \acp{WS} possible
+		\item Automatic invocation and GUI generation possible
+		\item Better integration with enterprise infrastructure
+		\item Decentralisation: provide XMCDA \ac{WS} with industry standard tools
+		\item Easier interface with existing services (example: solve LP problem)
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Goals: Ease developer work}
+	\begin{itemize}
+		\item Give guarantee: input type has been checked against some specific grammar
+		\item Example: I know I receive a list of …
+		\item Possible to use libraries to transform XML to language specific types
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Constraints}
+	\begin{itemize}
+		\item Interface various \acp{WS}
+		\item Reuse global encoding standard (XMCDA v2 / v3)
+		\item Compatibility with existing \acp{WS}
+		\item As easy to use for non-XML aware developers
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Approach}
+	\begin{itemize}
+		\item XMCDA-Modular (XM) Standard provides a set of types
+		\item Called XM types
+		\item Example: set of alternatives, value function, …
+		\item Each \ac{WS} has a specific schema
+		\item This schema is composed of a list of entries
+		\item Some of them are XM types
+	\end{itemize}
+	Compare to: one schema for every \ac{WS}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Reuse}
+	\begin{itemize}
+		\item The single types could be borrowed from XMCDA v. x
+		\item Some types could even be made more constrained
+		\item Developer may provide its own type when too specific for deserving being in the standard
+		\item Developers may re-use types from the industry, e.g. LP
+		\item Compatibility with existing \acp{WS}: have to develop translators (per type)
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Developer POV}
+	\begin{itemize}
+		\item Instead of Diviz descriptor, has to provide a schema
+		\item More difficult!
+		\item Possible to help with tools (to be developed!)
+		\item Possible conversion with Diviz descriptor files
+		\item Leverage existing tools for easy / automatic parsing of input / output
+		\item[⇒] To be developed as well!
+		\item Provides standard, more general functionality equivalent to existing manually programmed libraries, with support for languages to come
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Infrastructure}
+	\begin{itemize}
+		\item Leverage WSDL, language for SOAP WS description
+		\item Provides standard, more general equivalent to Diviz descriptor
+		\item Extend Diviz to account for standard (WSDL) descriptors suppl to Diviz-like
+	\end{itemize}
+\end{frame}
+
+\section{Implementation}
+\begin{frame}
+	\frametitle{Implementation}
+	\begin{itemize}
+		\item Course at Dauphine, MIAGE M2
+		\item Some of these students know the prerequisites
+		\item Could be interested in (parts of) this as student projects
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Proposed course of action}
+	\begin{itemize}
+		\item You comment
+		\item We discuss
+		\item I (try to) get parts of the idea implemented
+		\item To be developed progressively!
+		\item I keep you posted
+		\item Possibly: request some resources for online hosting (later!)
+		\item This proposal is compatible with any improvements to the XMCDA schema
+		\item Don’t hold your breath!
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[plain]
+	\addtocounter{framenumber}{-1}
+	\begin{center}
+		\huge
+		\textit{Thank you for your attention!}
+	\end{center}
+\end{frame}
+
+\appendix
+\AtBeginSection{
+}
+
+\end{document}
+
+\clearpage\pdfbookmark[2]{\refname}{\refname}
+\begin{frame}[allowframebreaks]
+	\frametitle{\refname}
+ 	\bibliography{zotero}
+\end{frame}
+
+\clearpage\pdfbookmark{License}{License}
+\begin{frame}[plain]
+	\frametitle{License}
+	This presentation, and the associated \LaTeX{} code, are published under the \href{http://opensource.org/licenses/MIT}{MIT license}. Feel free to reuse (parts of) the presentation, under condition that you cite the author.
+	
+	Credits are to be given to \href{http://www.lamsade.dauphine.fr/~ocailloux/}{Olivier Cailloux}, Université Paris-Dauphine.
+\end{frame}
+\addtocounter{framenumber}{-1}
+\end{document}
+
+\begin{frame}
+	\frametitle{\subsecname}
+	\begin{itemize}
+		\item 
+	\end{itemize}
+\end{frame}
+
