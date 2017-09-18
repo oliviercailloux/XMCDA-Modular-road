@@ -30,6 +30,9 @@
 		\path (current page.south east) node[anchor=south east, inner sep=0] {
 			\includegraphics[height=1cm]{PSL.png}
 		};
+		\path (current page.south) ++ (0, 4em) node[anchor=south, inner sep=0] {
+			\scriptsize\url{https://github.com/oliviercailloux/XMCDA-Modular-road}
+		};
 	}
 	\titlepage
 \end{frame}
@@ -100,7 +103,7 @@
 		\item In example: Common encoding of “ordered list of alternatives”
 		\item In general: Common encoding of other inputs and outputs: “list of alternatives each having a name and a value”, …
 		\item With low redundancy: only one way of specifying each possible input type
-		\item Common language, but each WS have specific inputs and outputs
+		\item Common language, but each WS has specific inputs and outputs
 	\end{itemize}
 %		\item Developer is helped with automatic check of type constraints satisfaction
 %		\item Declaration of constraints in a standard language: 
@@ -254,6 +257,7 @@
 		\item You comment
 		\item We discuss
 		\item I (try to) get parts of the idea implemented
+		\item Using XMCDA-Modular \href{https://github.com/xmcda-modular/schema}{schema} types to get started
 		\item To be developed progressively!
 		\item I keep you posted
 		\item Possibly: request some resources for online hosting (later!)
